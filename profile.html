@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+{% block content %}
+<div class="profile-header">
+    <span class="avatar avatar-lg">{{ profile_user.username|initials }}</span>
+    <div>
+    <h2>{{ profile_user.username }}</h2>
+    <small class="bio">Member since {{ profile_user.created_at.strftime('%b %Y') }}</small>
+    <p class="bio">{{ profile_user.bio or "No bio yet." }}</p>
+
+    {% if profile_user.github_url or profile_user.linkedin_url or profile_user.portfolio_url %}
+    <div class="profile-links">
+        {% if profile_user.github_url %}
+        <a href="{{ profile_user.github_url }}" target="_blank" rel="noopener" class="profile-link">🐙 GitHub</a>
+        {% endif %}
+        {% if profile_user.linkedin_url %}
+        <a href="{{ profile_user.linkedin_url }}" target="_blank" rel="noopener" class="profile-link">💼 LinkedIn</a>
+        {% endif %}
+        {% if profile_user.portfolio_url %}
+        <a href="{{ profile_user.portfolio_url }}" target="_blank" rel="noopener" class="profile-link">🔗 Portfolio</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if current_user.is_authenticated and current_user.id == profile_user.id %}
+        <a href="{{ url_for('main.edit_profile') }}" class="btn btn-secondary btn-small">Edit Profile</a>
+    {% endif %}
+    </div>
+</div>
+
+<div class="skill-columns">
+    <div class="skill-column">
+        <h3>Can Teach</h3>
+        {% for skill in profile_user.offered_skills() %}
+        <div class="skill-card">
+            <h4>{{ skill.title }}</h4>
+            <span class="category-tag">{{ skill.category }}</span>
+            {% if skill.years_experience %}<span class="experience-tag">{{ skill.years_experience }}+ yrs experience</span>{% endif %}
+            <p>{{ skill.description }}</p>
+            {% if skill.certificate_name %}
+            <p class="certificate">
+                🎓 {{ skill.certificate_name }}
+                {% if skill.certificate_url %}<a href="{{ skill.certificate_url }}" target="_blank" rel="noopener">(view)</a>{% endif %}
+            </p>
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.id != profile_user.id %}
+                <a href="{{ url_for('skills.request_exchange', skill_id=skill.id) }}" class="btn btn-primary btn-small">Request Exchange</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <p class="empty-state">Nothing listed yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="skill-column">
+        <h3>Wants to Learn</h3>
+        {% for skill in profile_user.wanted_skills() %}
+        <div class="skill-card">
+            <h4>{{ skill.title }}</h4>
+            <span class="category-tag">{{ skill.category }}</span>
+            <p>{{ skill.description }}</p>
+        </div>
+        {% else %}
+        <p class="empty-state">Nothing listed yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

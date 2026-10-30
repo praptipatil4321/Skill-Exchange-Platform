@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+<h2>Messages</h2>
+
+{% if conversations %}
+<div class="conversation-list">
+    {% for c in conversations %}
+    <a class="conversation-card" href="{{ url_for('chat.conversation', exchange_id=c.exchange.id) }}">
+        <div class="conversation-info">
+            <strong>{{ c.other_user.username }}{% if c.unread_count %}<span class="unread-dot" title="{{ c.unread_count }} unread"></span>{% endif %}</strong>
+            <p class="conversation-skill">Re: {{ c.exchange.requested_skill.title }}</p>
+        </div>
+        {% if c.last_message %}
+        <p class="conversation-preview">
+            {% if c.last_message.sender_id == current_user.id %}You: {% endif %}
+            {% set a = attachment_of(c.last_message) %}
+            {% if a and not c.last_message.body %}{{ '📷 Photo' if a.kind == 'image' else '📎 ' ~ a.name }}
+            {% elif c.last_message.body %}{{ c.last_message.body[:60] }}{% if c.last_message.body|length > 60 %}&hellip;{% endif %}
+            {% endif %}
+        </p>
+        {% else %}
+        <p class="conversation-preview empty-state">No messages yet &mdash; say hi!</p>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty-state">No active conversations yet. Once you and someone else accept an exchange request, you'll be able to chat here.</p>
+{% endif %}
+{% endblock %}

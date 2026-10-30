@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Browse Skills{% endblock %}
+{% block content %}
+<div class="page-header"><div><h2>Browse Skills</h2><p>Find someone to learn from.</p></div></div>
+
+<form method="GET" class="search-bar">
+    <input type="text" name="q" class="input" placeholder="🔍 Search by title..." value="{{ search }}">
+    <input type="text" name="category" class="input" placeholder="Category..." value="{{ category }}">
+    <select name="min_experience" class="input">
+        <option value="">Any experience</option>
+        {% for n in [1,2,3,5,10,15] %}<option value="{{ n }}" {% if min_experience == n|string %}selected{% endif %}>{{ n }}+ years</option>{% endfor %}
+    </select>
+    <select name="sort" class="input">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+        <option value="experience" {% if sort == 'experience' %}selected{% endif %}>Most experienced</option>
+        <option value="title" {% if sort == 'title' %}selected{% endif %}>A → Z</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+{% if categories %}
+<div class="chips">
+    <a class="chip {{ 'active' if not category }}" href="{{ url_for('skills.browse') }}">All</a>
+    {% for c in categories %}<a class="chip {{ 'active' if category == c }}" href="{{ url_for('skills.browse', category=c) }}">{{ c }}</a>{% endfor %}
+</div>
+{% endif %}
+
+<p class="result-count">{{ skills|length }} skill{{ '' if skills|length == 1 else 's' }} found</p>
+<div class="skill-grid">
+    {% for skill in skills %}
+    <div class="skill-card">
+        <h4>{{ skill.title }}</h4>
+        <div><span class="category-tag">{{ skill.category }}</span>{% if skill.years_experience %}<span class="experience-tag">{{ skill.years_experience }}+ yrs</span>{% endif %}</div>
+        <p>{{ skill.description }}</p>
+        {% if skill.certificate_name %}<p class="certificate">🎓 {{ skill.certificate_name }}{% if skill.certificate_url %} <a href="{{ skill.certificate_url }}" target="_blank" rel="noopener">(view)</a>{% endif %}</p>{% endif %}
+        <p class="owner"><span class="avatar">{{ skill.owner.username|initials }}</span><a href="{{ url_for('main.profile', username=skill.owner.username) }}">{{ skill.owner.username }}</a></p>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('skills.request_exchange', skill_id=skill.id) }}" class="btn btn-primary btn-small">Request Exchange</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-small">Log in to request</a>
+        {% endif %}
+    </div>
+    {% else %}<p class="empty-state">No skills found. Try a different search.</p>{% endfor %}
+</div>
+{% endblock %}

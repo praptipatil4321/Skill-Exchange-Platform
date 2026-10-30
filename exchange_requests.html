@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Exchange Requests{% endblock %}
+{% block content %}
+<h2>Exchange Requests</h2>
+
+<h3>Received</h3>
+{% for req in received %}
+<div class="request-card status-{{ req.status }}">
+    <p><strong>{{ req.sender.username }}</strong> wants to learn <strong>{{ req.requested_skill.title }}</strong></p>
+    {% if req.offered_skill %}
+        <p>In exchange, they offer: <strong>{{ req.offered_skill.title }}</strong></p>
+    {% endif %}
+    {% if req.message %}<p class="msg">"{{ req.message }}"</p>{% endif %}
+    <span class="status-badge status-{{ req.status }}">{{ req.status }}</span>
+    {% if req.status == "pending" %}
+    <div class="request-actions">
+        <form method="POST" action="{{ url_for('skills.respond_exchange', request_id=req.id, action='accept') }}">
+            <button type="submit" class="btn btn-primary btn-small">Accept</button>
+        </form>
+        <form method="POST" action="{{ url_for('skills.respond_exchange', request_id=req.id, action='reject') }}">
+            <button type="submit" class="btn btn-danger btn-small">Reject</button>
+        </form>
+    </div>
+    {% elif req.status == "accepted" %}
+    <div class="request-actions">
+        <a href="{{ url_for('chat.conversation', exchange_id=req.id) }}" class="btn btn-primary btn-small">Open Chat</a>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<p class="empty-state">No requests received yet.</p>
+{% endfor %}
+
+<h3>Sent</h3>
+{% for req in sent %}
+<div class="request-card status-{{ req.status }}">
+    <p>You requested <strong>{{ req.requested_skill.title }}</strong> from <strong>{{ req.receiver.username }}</strong></p>
+    {% if req.offered_skill %}
+        <p>You offered: <strong>{{ req.offered_skill.title }}</strong></p>
+    {% endif %}
+    <span class="status-badge status-{{ req.status }}">{{ req.status }}</span>
+    {% if req.status == "accepted" %}
+    <div class="request-actions">
+        <a href="{{ url_for('chat.conversation', exchange_id=req.id) }}" class="btn btn-primary btn-small">Open Chat</a>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<p class="empty-state">No requests sent yet.</p>
+{% endfor %}
+{% endblock %}

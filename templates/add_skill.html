@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Add Skill{% endblock %}
+{% block content %}
+<div class="form-card">
+    <h2>Add a Skill</h2>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.title.label }}
+            {{ form.title(class_="input") }}
+            {% for error in form.title.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.description.label }}
+            {{ form.description(class_="input", rows=4) }}
+        </div>
+        <div class="field">
+            {{ form.category.label }}
+            {{ form.category(class_="input", placeholder="e.g. Music, Coding, Cooking") }}
+        </div>
+        <div class="field">
+            {{ form.skill_type.label }}
+            {{ form.skill_type(class_="input") }}
+        </div>
+
+        <h3 class="form-subheading">Experience &amp; Credentials</h3>
+        <p class="field-hint">Optional, but it helps others judge fit — e.g. years coding, a certification, a GitHub repo, a cooking diploma, a music conservatory certificate.</p>
+
+        <div class="field">
+            {{ form.years_experience.label }}
+            {{ form.years_experience(class_="input", placeholder="e.g. 5") }}
+            {% for error in form.years_experience.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.certificate_name.label }}
+            {{ form.certificate_name(class_="input", placeholder="e.g. AWS Certified Developer, Le Cordon Bleu Diploma") }}
+            {% for error in form.certificate_name.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.certificate_url.label }}
+            {{ form.certificate_url(class_="input", placeholder="Link to certificate, GitHub, portfolio, etc.") }}
+            {% for error in form.certificate_url.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Skill</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Welcome - SkillExchange{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Trade skills,<br><span>not money.</span></h1>
+    <p>Teach what you know, learn what you don't. Connect with people who want to swap skills — chat, video call and grow together.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started — it's free</a>
+        <a href="{{ url_for('skills.browse') }}" class="btn btn-secondary">Browse Skills</a>
+    </div>
+    <div class="stats-strip">
+        <div><b>{{ stats.members }}</b><span>Members</span></div>
+        <div><b>{{ stats.skills }}</b><span>Skills offered</span></div>
+        <div><b>{{ stats.exchanges }}</b><span>Active exchanges</span></div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps">
+        <div class="step"><div class="icon">📝</div><h3>List your skills</h3><p>Add what you can teach and what you want to learn, with credentials.</p></div>
+        <div class="step"><div class="icon">🔍</div><h3>Browse &amp; match</h3><p>Search by category and experience to find the right mentor.</p></div>
+        <div class="step"><div class="icon">🤝</div><h3>Exchange</h3><p>Send a request, then chat and video call once it's accepted.</p></div>
+    </div>
+</section>
+{% endblock %}

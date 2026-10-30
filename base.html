@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkillExchange{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    {% set ep = request.endpoint or '' %}
+    <nav class="navbar">
+        <a href="{{ url_for('main.index') }}" class="brand"><span class="brand-logo">⇄</span>SkillExchange</a>
+        <button id="nav-toggle" class="nav-toggle" aria-label="Menu">☰</button>
+        <div class="nav-links" id="nav-links">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="{{ 'active' if ep == 'main.dashboard' }}">Dashboard</a>
+                <a href="{{ url_for('skills.browse') }}" class="{{ 'active' if ep == 'skills.browse' }}">Browse</a>
+                <a href="{{ url_for('skills.exchange_requests') }}" class="nav-item {{ 'active' if ep == 'skills.exchange_requests' }}">Requests<span id="requests-badge" class="nav-dot" style="display:none;"></span></a>
+                <a href="{{ url_for('chat.conversations') }}" class="nav-item {{ 'active' if ep.startswith('chat.') }}">Messages<span id="messages-badge" class="nav-dot" style="display:none;"></span></a>
+                <a href="{{ url_for('main.profile', username=current_user.username) }}" class="nav-user"><span class="avatar">{{ current_user.username|initials }}</span>{{ current_user.username }}</a>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('skills.browse') }}">Browse</a>
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="cta">Sign Up</a>
+            {% endif %}
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer"><p>SkillExchange &mdash; learn something, teach something.</p></footer>
+
+    {% if current_user.is_authenticated %}<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>{% endif %}
+</body>
+</html>

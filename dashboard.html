@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h2>Welcome back, {{ user.username }} 👋</h2><p>Here's what's happening with your exchanges.</p></div>
+    <a href="{{ url_for('skills.add_skill') }}" class="btn btn-primary">+ Add Skill</a>
+</div>
+
+<div class="stat-grid">
+    <a class="stat-card" href="{{ url_for('skills.exchange_requests') }}"><b>{{ stats.pending }}</b><span>Pending requests</span></a>
+    <a class="stat-card" href="{{ url_for('chat.conversations') }}"><b>{{ stats.active }}</b><span>Active exchanges</span></a>
+    <a class="stat-card" href="{{ url_for('chat.conversations') }}"><b>{{ stats.unread }}</b><span>Unread messages</span></a>
+    <div class="stat-card"><b>{{ user.offered_skills()|length }} / {{ user.wanted_skills()|length }}</b><span>Teach / Learn</span></div>
+</div>
+
+<div class="skill-columns">
+    <div class="skill-column">
+        <h3>Skills I can teach</h3>
+        {% for skill in user.offered_skills() %}
+        <div class="skill-card">
+            <h4>{{ skill.title }}</h4>
+            <span class="category-tag">{{ skill.category }}</span>
+            {% if skill.years_experience %}<span class="experience-tag">{{ skill.years_experience }}+ yrs</span>{% endif %}
+            <p>{{ skill.description }}</p>
+            {% if skill.certificate_name %}<p class="certificate">🎓 {{ skill.certificate_name }}{% if skill.certificate_url %} <a href="{{ skill.certificate_url }}" target="_blank" rel="noopener">(view)</a>{% endif %}</p>{% endif %}
+            <form method="POST" action="{{ url_for('skills.delete_skill', skill_id=skill.id) }}"><button type="submit" class="btn btn-danger btn-small">Remove</button></form>
+        </div>
+        {% else %}<p class="empty-state">No skills listed yet. Add one!</p>{% endfor %}
+    </div>
+    <div class="skill-column">
+        <h3>Skills I want to learn</h3>
+        {% for skill in user.wanted_skills() %}
+        <div class="skill-card">
+            <h4>{{ skill.title }}</h4>
+            <span class="category-tag">{{ skill.category }}</span>
+            <p>{{ skill.description }}</p>
+            <form method="POST" action="{{ url_for('skills.delete_skill', skill_id=skill.id) }}"><button type="submit" class="btn btn-danger btn-small">Remove</button></form>
+        </div>
+        {% else %}<p class="empty-state">No wanted skills listed yet.</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Chat with {{ other_user.username }}{% endblock %}
+
+{% macro render_attachment(a) %}
+{% if a %}
+  {% if a.kind == 'image' %}
+    <a href="{{ a.url }}" target="_blank" rel="noopener"><img src="{{ a.url }}" alt="{{ a.name }}" class="chat-image"></a>
+  {% elif a.kind == 'video' %}
+    <video class="chat-video" controls preload="metadata" src="{{ a.url }}"></video>
+  {% elif a.kind == 'audio' %}
+    <audio class="chat-audio" controls preload="metadata" src="{{ a.url }}"></audio>
+  {% endif %}
+  {% if a.kind in ('pdf', 'file') or a.kind in ('video', 'audio') %}
+  <a class="attachment-card" href="{{ a.url }}{{ '?download=1' if a.kind in ('video','audio') else '' }}" target="_blank" rel="noopener" data-kind="{{ a.kind }}" data-name="{{ a.name }}">
+      <span class="attachment-icon"></span>
+      <span class="attachment-info"><strong>{{ a.name }}</strong><small>{{ a.size_label }}</small></span>
+      <span class="attachment-action">{{ '↓' if a.kind != 'pdf' else '↗' }}</span>
+  </a>
+  {% endif %}
+{% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="chat-header">
+    <a href="{{ url_for('chat.conversations') }}" class="back-link">&larr; All conversations</a>
+    <div class="chat-header-row">
+        <div>
+            <h2>Chat with {{ other_user.username }}</h2>
+            <p class="chat-subtitle">
+                Exchange: <strong>{{ exchange.requested_skill.title }}</strong>
+                {% if exchange.offered_skill %} for <strong>{{ exchange.offered_skill.title }}</strong>{% endif %}
+            </p>
+        </div>
+        <button type="button" id="video-call-btn" class="btn btn-primary">📹 Start Video Call</button>
+    </div>
+</div>
+
+<div id="video-call-panel" class="video-call-panel" style="display:none;">
+    <div class="video-call-toolbar">
+        <span>Video call with {{ other_user.username }}</span>
+        <button type="button" id="close-video-call" class="btn btn-danger btn-small">End Call</button>
+    </div>
+    <iframe id="video-call-frame" class="video-call-frame"
+        allow="camera; microphone; fullscreen; display-capture; autoplay" src="about:blank" title="Video call"></iframe>
+</div>
+
+<div id="chat-window" class="chat-window" data-exchange-id="{{ exchange.id }}" data-video-room="{{ video_room }}" data-max-mb="{{ config.MAX_UPLOAD_MB }}">
+    <div id="drop-overlay" class="drop-overlay">📎 Drop file to attach</div>
+    <div id="chat-messages" class="chat-messages">
+        {% for m in messages %}
+        {% set a = attachment_of(m) %}
+        <div class="chat-message {{ 'mine' if m.sender_id == current_user.id else 'theirs' }}" data-id="{{ m.id }}">
+            <div class="chat-bubble">
+                {{ render_attachment(a) }}
+                {% if m.body %}<p>{{ m.body }}</p>{% endif %}
+                <span class="chat-meta">{{ m.sender.username }} &middot; {{ m.created_at.strftime('%b %d, %I:%M %p') }}</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="empty-state" id="chat-empty-state">No messages yet. Say hello!</p>
+        {% endfor %}
+    </div>
+
+    <div id="attachment-preview" class="attachment-preview" style="display:none;">
+        <div id="attachment-preview-thumb" class="attachment-preview-thumb"></div>
+        <div class="attachment-info"><strong id="attachment-preview-name"></strong><small id="attachment-preview-size"></small>
+            <div class="upload-progress" id="upload-progress" style="display:none;"><div id="upload-progress-bar"></div></div>
+        </div>
+        <button type="button" id="attachment-preview-remove" class="btn btn-danger btn-small">Remove</button>
+    </div>
+
+    <form id="chat-form" class="chat-form">
+        <label for="chat-file-input" class="chat-attach-btn" title="Attach any file (max {{ config.MAX_UPLOAD_MB }} MB)">📎</label>
+        <input type="file" id="chat-file-input" hidden>
+        <textarea id="chat-input" placeholder="Type a message, or drop / paste a file..." maxlength="2000"></textarea>
+        <button type="submit" id="chat-send" class="btn btn-primary">Send</button>
+    </form>
+    <p id="chat-error" class="chat-error" style="display:none;"></p>
+</div>
+
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

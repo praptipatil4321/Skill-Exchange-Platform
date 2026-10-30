@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block content %}
+<div class="form-card">
+    <h2>Edit Profile</h2>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.bio.label }}
+            {{ form.bio(class_="input", rows=5) }}
+            {% for error in form.bio.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <h3 class="form-subheading">Professional Links</h3>
+        <p class="field-hint">Add whichever apply to you — a coder might link GitHub, a musician might link SoundCloud or YouTube, a chef might link Instagram. These show up on your public profile.</p>
+
+        <div class="field">
+            {{ form.github_url.label }}
+            {{ form.github_url(class_="input", placeholder="https://github.com/yourusername") }}
+            {% for error in form.github_url.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.linkedin_url.label }}
+            {{ form.linkedin_url(class_="input", placeholder="https://linkedin.com/in/yourusername") }}
+            {% for error in form.linkedin_url.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.portfolio_url.label }}
+            {{ form.portfolio_url(class_="input", placeholder="https://...") }}
+            <span class="field-hint">{{ form.portfolio_url.description }}</span>
+            {% for error in form.portfolio_url.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock %}

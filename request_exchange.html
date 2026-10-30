@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Request Exchange{% endblock %}
+{% block content %}
+<div class="form-card">
+    <h2>Request: {{ skill.title }}</h2>
+    <p>Owned by <strong>{{ skill.owner.username }}</strong></p>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        {{ form.requested_skill_id() }}
+        <div class="field">
+            {{ form.offered_skill_id.label }}
+            {{ form.offered_skill_id(class_="input") }}
+        </div>
+        <div class="field">
+            {{ form.message.label }}
+            {{ form.message(class_="input", rows=4, placeholder="Introduce yourself and propose a time/format...") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Send Request</button>
+    </form>
+</div>
+{% endblock %}
